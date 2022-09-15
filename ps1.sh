@@ -49,7 +49,7 @@ getdate(){
 }
 
 leftprompt(){
-    printf "\r$FG_YELLOW$(whoami)@$(hostname)$RESET $FG_CYAN$(pwd)$RESET"
+    printf "\r$FG_YELLOW$(whoami)@$(hostname)$RESET $FG_CYAN$(pwd|sed "s|${HOME}|~|g")$RESET"
 }
 
 rightprompt(){
