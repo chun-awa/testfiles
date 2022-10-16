@@ -1,6 +1,0 @@
-#!/bin/sh
-echo "Setting hostname..."
-hostname -F /etc/hostname &
-echo "Starting Networking..."
-ifup lo &
-ifup eth0 &
