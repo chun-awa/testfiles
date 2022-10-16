@@ -1,0 +1,10 @@
+#!/bin/sh
+for i in /var/packages/*;do
+    for j in ${i}/*;do
+        echo "Installing ${j}..."
+        tar -xf ${j} &
+    done
+    if [[ ${i} == "/var/packages/core" ]];then
+        wait
+    fi
+done
