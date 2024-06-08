@@ -17,7 +17,7 @@ jobs:
     - name: Get fastfetch
       run: |
         whoami
-        curl -L https://github.com/fastfetch-cli/fastfetch/releases/download/2.15.0/fastfetch-linux-amd64.deb -O fastfetch.deb
+        curl -L https://github.com/fastfetch-cli/fastfetch/releases/download/2.15.0/fastfetch-linux-amd64.deb > fastfetch.deb
         sudo apt-get install ./fastfetch.deb
     - name: Run fastfetch
       run: |
