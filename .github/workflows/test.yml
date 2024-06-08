@@ -34,7 +34,7 @@ jobs:
 
     - name: Run Docker container
       run: |
-        docker run --rm -v $PWD/archiso-out:/archiso-out archiso-builder
+        docker run --rm --privileged -v $PWD/archiso-out:/archiso-out archiso-builder
 
     - name: Upload ISO
       uses: actions/upload-artifact@v3
