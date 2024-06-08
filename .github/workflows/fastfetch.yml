@@ -16,10 +16,9 @@ jobs:
     steps:
     - name: Get fastfetch
       run: |
-        whoami
+        whoami0s
         curl -L https://github.com/fastfetch-cli/fastfetch/releases/download/2.15.0/fastfetch-linux-amd64.deb > fastfetch.deb
         sudo apt-get install ./fastfetch.deb
     - name: Run fastfetch
       run: |
-        fastfetch -c /usr/share/fastfetch/presets/all.jsonc                                                                                                                          ✔  at 17:40:44  
-
+        fastfetch -c /usr/share/fastfetch/presets/all.jsonc
