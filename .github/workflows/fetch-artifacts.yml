@@ -1,4 +1,4 @@
-name: Fetch Artifact
+name: Fetch Artifact from Another Repository
 
 on:
   workflow_dispatch:
@@ -9,25 +9,39 @@ jobs:
     
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
       
-    - name: Get Artifact ID
-      id: get-artifact-id
+    - name: Get Latest Run ID from Other Repo
+      id: get-latest-run
       run: |
-        REPO="LingmoOS/archlingmo-archiso-config"
+        OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         LATEST_RUN_ID=$(curl -s \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/REPO/actions/runs \
+          https://api.github.com/repos/$OTHER_REPO/actions/runs \
           | jq '.workflow_runs | map(select(.status == "completed")) | first | .id')
+        echo "LATEST_RUN_ID=$LATEST_RUN_ID" >> $GITHUB_ENV
+    
+    - name: Get Artifact ID from Other Repo
+      id: get-artifact-id
+      run: |
+        OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         ARTIFACT_ID=$(curl -s \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/$REPO/actions/runs/${LATEST_RUN_ID}/artifacts \
+          https://api.github.com/repos/$OTHER_REPO/actions/runs/${{ env.LATEST_RUN_ID }}/artifacts \
           | jq '.artifacts | first | .id')
         echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+      
+    - name: Download Artifact from Other Repo
+      uses: actions/download-artifact@v3
+      with:
+        # NOTE: This action does not support downloading artifacts from other repositories directly.
+        # Therefore, we will use curl to download the artifact.
+        name: artifact
+        path: ./artifact
 
-    - name: Download Artifact
+    - name: Download Artifact using curl
       run: |
         OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         curl -sL \
