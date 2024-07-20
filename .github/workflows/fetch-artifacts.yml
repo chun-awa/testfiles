@@ -32,14 +32,6 @@ jobs:
           https://api.github.com/repos/$OTHER_REPO/actions/runs/${{ env.LATEST_RUN_ID }}/artifacts \
           | jq '.artifacts | first | .id')
         echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
-      
-    - name: Download Artifact from Other Repo
-      uses: actions/download-artifact@v3
-      with:
-        # NOTE: This action does not support downloading artifacts from other repositories directly.
-        # Therefore, we will use curl to download the artifact.
-        name: artifact
-        path: ./artifact
 
     - name: Download Artifact using curl
       run: |
