@@ -2,6 +2,7 @@ name: Fetch Artifact from Another Repository
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   download-artifact:
