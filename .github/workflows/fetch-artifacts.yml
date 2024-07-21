@@ -21,6 +21,11 @@ jobs:
           https://api.github.com/repos/$OTHER_REPO/actions/runs \
           | jq '.workflow_runs | map(select(.status == "completed")) | first | .id')
         echo "LATEST_RUN_ID=$LATEST_RUN_ID" >> $GITHUB_ENV
+    
+    - name: Get Artifact ID from Other Repo
+      id: get-artifact-id
+      run: |
+        OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         ARTIFACT_ID=$(curl -s \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
