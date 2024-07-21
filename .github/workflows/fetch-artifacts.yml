@@ -2,6 +2,7 @@ name: Fetch Artifact from Another Repository
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   download-artifact:
@@ -22,7 +23,6 @@ jobs:
           | jq '.workflow_runs | map(select(.status == "completed")) | first | .id')
         echo "LATEST_RUN_ID=$LATEST_RUN_ID" >> $GITHUB_ENV
         
-        OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         ARTIFACT_ID=$(curl -s \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
