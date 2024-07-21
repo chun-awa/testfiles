@@ -1,4 +1,4 @@
-name: Fetch Artifact
+name: Fetch Artifact from Another Repository
 
 on:
   workflow_dispatch:
@@ -7,8 +7,12 @@ jobs:
   download-artifact:
     runs-on: ubuntu-latest
     
-    steps:  
-    - name: Download Artifact
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      
+    - name: Get Latest Run ID from Other Repo
+      id: get-latest-run
       run: |
         OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         LATEST_RUN_ID=$(curl -s \
@@ -23,6 +27,10 @@ jobs:
           https://api.github.com/repos/$OTHER_REPO/actions/runs/${{ env.LATEST_RUN_ID }}/artifacts \
           | jq '.artifacts | first | .id')
         echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+
+    - name: Download Artifact using curl
+      run: |
+        OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         curl -L \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
