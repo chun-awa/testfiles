@@ -8,10 +8,7 @@ jobs:
   download-artifact:
     runs-on: ubuntu-latest
     
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-      
+    steps:      
     - name: Get Latest Run ID from Other Repo
       id: get-latest-run
       run: |
@@ -21,22 +18,15 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$OTHER_REPO/actions/runs \
           | jq '.workflow_runs | map(select(.status == "completed")) | first | .id')
-        echo "LATEST_RUN_ID=$LATEST_RUN_ID" >> $GITHUB_ENV
-        
         ARTIFACT_ID=$(curl -s \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$OTHER_REPO/actions/runs/${LATEST_RUN_ID}/artifacts \
           | jq '.artifacts | first | .id')
-        echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
-
-    - name: Download Artifact using curl
-      run: |
-        OTHER_REPO="LingmoOS/archlingmo-archiso-config"
         curl -L \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/$OTHER_REPO/actions/artifacts/${{ env.ARTIFACT_ID }}/zip \
+          https://api.github.com/repos/$OTHER_REPO/actions/artifacts/${ARTIFACT_ID}/zip \
           -o artifact.zip
         unzip artifact.zip -d ./artifact
 
