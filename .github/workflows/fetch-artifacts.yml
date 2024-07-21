@@ -26,7 +26,7 @@ jobs:
         ARTIFACT_ID=$(curl -s \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/$OTHER_REPO/actions/runs/${{ env.LATEST_RUN_ID }}/artifacts \
+          https://api.github.com/repos/$OTHER_REPO/actions/runs/${LATEST_RUN_ID}/artifacts \
           | jq '.artifacts | first | .id')
         echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
 
