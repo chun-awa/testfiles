@@ -36,7 +36,7 @@ jobs:
         7z l *.iso
 
     - name: Split Artifact
-      run: 7z a -tzip -v1800m archlingmo.zip *.iso
+      run: 7z a -tzip -v1900m archlingmo.zip *.iso
         
     - name: Get the current date
       run: echo "RELEASE_DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
