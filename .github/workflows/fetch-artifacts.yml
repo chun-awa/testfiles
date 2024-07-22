@@ -32,8 +32,7 @@ jobs:
 
     - name: List Files in Artifact
       run: |
-        ls -la ./artifact
         cd artifact
-        sudo apt install p7zip-full
+        ls -lh *.iso
         7z x *.iso
         find .
