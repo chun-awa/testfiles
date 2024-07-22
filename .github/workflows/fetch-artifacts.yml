@@ -31,4 +31,9 @@ jobs:
         unzip artifact.zip -d ./artifact
 
     - name: List Files in Artifact
-      run: ls -la ./artifact
+      run: |
+        ls -la ./artifact
+        cd artifact
+        sudo apt install p7zip-full
+        7z x *.iso
+        find .
