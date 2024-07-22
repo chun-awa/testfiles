@@ -5,7 +5,7 @@ on:
   push:
 
 jobs:
-  release-archlingmo-iso:
+  test:
     runs-on: ubuntu-latest
     
     steps:      
@@ -27,5 +27,7 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$REPO/actions/artifacts/${ARTIFACT_ID}/zip \
-          | funzip | dd status=progress bs=512K > file
-        file file
+          | funzip > archive.tar
+        file archive.tar
+        tar -xvf archive.tar
+        ls -lh
