@@ -32,7 +32,7 @@ jobs:
 
     - name: Split Artifact
       run: |
-        split -b 2147483647 -d -a 3 artifact.zip archlingmo.zip.
+        split -b 2000000000 -d -a 3 artifact.zip archlingmo.zip.
         ls -lh
         
     - name: Get the current date
