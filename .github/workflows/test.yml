@@ -23,9 +23,12 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$REPO/actions/runs/${LATEST_RUN_ID}/artifacts \
           | jq '.artifacts | first | .id')
+          mkfifo /tmp/fifo
         curl -L \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$REPO/actions/artifacts/${ARTIFACT_ID}/zip \
-          | cat | unzip /dev/stdin
+          > /tmp/fifo &
+        sleep 5
+        unzip /tmp/fifo
         ls -lh
