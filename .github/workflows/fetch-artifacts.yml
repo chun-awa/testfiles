@@ -28,11 +28,9 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$OTHER_REPO/actions/artifacts/${ARTIFACT_ID}/zip \
           -o artifact.zip
-        unzip artifact.zip -d ./artifact
+        unzip artifact.zip
 
     - name: List Files in Artifact
       run: |
-        cd artifact
         ls -lh *.iso
-        7z x *.iso
-        find .
+        7z l *.iso
