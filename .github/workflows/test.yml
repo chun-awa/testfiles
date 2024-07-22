@@ -27,5 +27,5 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$REPO/actions/artifacts/${ARTIFACT_ID}/zip \
-          | unzip /dev/stdin
+          | (sleep 5;unzip /dev/stdin)
         ls -lh
