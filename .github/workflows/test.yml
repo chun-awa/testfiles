@@ -29,6 +29,6 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/$REPO/actions/artifacts/${ARTIFACT_ID}/zip \
           > /tmp/fifo &
-        sleep 5
+        sleep 20
         unzip /tmp/fifo
         ls -lh
