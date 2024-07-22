@@ -30,10 +30,13 @@ jobs:
           https://api.github.com/repos/$REPO/actions/artifacts/${ARTIFACT_ID}/zip \
           -o artifact.zip
 
-    - name: Split Artifact
+    - name: List files in artifact
       run: |
         unzip artifact.zip
-        7z a -tzip -v2000000000b archlingmo.zip *.iso
+        7z l *.iso
+
+    - name: Split Artifact
+      run: 7z a -tzip -v1.9g archlingmo.zip *.iso
         
     - name: Get the current date
       run: echo "RELEASE_DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
