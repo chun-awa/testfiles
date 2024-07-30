@@ -12,28 +12,14 @@ jobs:
     steps:      
     - name: Download Artifact
       id: download-artifact
-      run: |
-        REPO="LingmoOS/archlingmo-archiso-config"
-        LATEST_RUN_ID=$(curl -s \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/$REPO/actions/runs \
-          | jq '.workflow_runs | map(select(.status == "completed")) | first | .id')
-        ARTIFACT_ID=$(curl -s \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/$REPO/actions/runs/${LATEST_RUN_ID}/artifacts \
-          | jq '.artifacts | first | .id')
-        curl -L \
-          -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/$REPO/actions/artifacts/${ARTIFACT_ID}/zip \
-          -o artifact.zip
+      uses: actions/download-artifact@v4
+      with:
+        repository: LingmoOS/archlingmo-archiso-config
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path: .
 
     - name: List files in artifact
-      run: |
-        unzip artifact.zip
-        7z l *.iso
+      run: 7z l *.iso
 
     - name: Split Artifact
       run: 7z a -tzip -v2097151k archlingmo.zip *.iso
