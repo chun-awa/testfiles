@@ -31,10 +31,7 @@ jobs:
         path: .
 
     - name: List files in artifact
-      run: 7z l *.iso
-
-    - name: Split Artifact
-      run: 7z a -tzip -v2097151k archlingmo.zip *.iso
+      run: 7z l archiso/*.iso
         
     - name: Get the current date
       run: echo "RELEASE_DATE=$(date +'%Y.%m.%d.%H.%M')" >> $GITHUB_ENV
@@ -42,5 +39,5 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-          files: archlingmo.zip*
+          files: archiso/*.iso
           tag_name: "${{ env.RELEASE_DATE }}"
