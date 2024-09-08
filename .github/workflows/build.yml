@@ -20,10 +20,7 @@ jobs:
     - name: Prepare build environment
       run: |
         adduser -D build -G abuild
-        cat>>/etc/doas.d/doas.conf<<EOF
-        permit :abuild
-        permit persist :abuild
-        EOF
+        echo "permit nopass :abuild" >> /etc/doas.d/doas.conf
         sudo -u build abuild-keygen -i -a -n
         sudo -u build git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git /home/build/aports
 
