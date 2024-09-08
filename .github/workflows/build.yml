@@ -23,7 +23,8 @@ jobs:
 
     - name: Build ISO
       run: |
-        abuild-keygen -i -a -n
+        whoami
+        doas abuild-keygen -i -a -n
         sh aports/scripts/mkimage.sh --tag edge \
                                       --outdir ./iso \
                                       --arch x86_64 \
