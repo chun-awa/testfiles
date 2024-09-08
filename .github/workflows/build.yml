@@ -17,9 +17,8 @@ jobs:
         apk update
         apk add --no-cache alpine-sdk alpine-conf syslinux xorriso squashfs-tools grub grub-efi doas mtools dosfstools coreutils
 
-    - name: Prepare build environment
+    - name: Clone aports
       run: |
-        abuild-keygen -i -a
         git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports
 
     - name: Build ISO
