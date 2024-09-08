@@ -14,17 +14,23 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
+        apk update
         apk add --no-cache alpine-sdk alpine-conf syslinux xorriso squashfs-tools grub grub-efi doas mtools dosfstools
 
-    - name: Clone aports repository
+    - name: Prepare build environment
       run: |
-        git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
+        adduser build -G abuild
+        cat>>/etc/doas.d/doas.conf<<EOF
+        permit :abuild
+        permit persist :abuild
+        EOF
+        doas -u build abuild-keygen -i -a
+        doas -u build git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git /home/build/aports
 
     - name: Build ISO
       run: |
-        mkdir iso
-        sh aports/scripts/mkimage.sh --tag edge \
-                                      --outdir ./iso \
+        doas -u build sh /home/build/aports/scripts/mkimage.sh --tag edge \
+                                      --outdir /home/build/iso \
                                       --arch x86_64 \
                                       --repository https://dl-cdn.alpinelinux.org/alpine/edge/main \
                                       --profile standard
@@ -34,4 +40,4 @@ jobs:
       with:
         name: iso
         compression-level: 0
-        path: iso/*.iso
+        path: /home/build/iso/*.iso
