@@ -19,9 +19,7 @@ jobs:
 
     - name: Prepare build environment
       run: |
-        export PATH=$PATH:/sbin:/usr/sbin
-        useradd -m build
-        usermod -aG abuild build
+        adduser build -G abuild
         cat>>/etc/doas.d/doas.conf<<EOF
         permit :abuild
         permit persist :abuild
