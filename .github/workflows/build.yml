@@ -19,9 +19,11 @@ jobs:
     - name: Clone aports repository
       run: |
         git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
+        pwd
 
     - name: Build ISO
       run: |
+        pwd
         sh aports/scripts/mkimage.sh --tag edge \
                                       --outdir ./iso \
                                       --arch x86_64 \
