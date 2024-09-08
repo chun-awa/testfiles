@@ -19,7 +19,7 @@ jobs:
 
     - name: Prepare build environment
       run: |
-        adduser build -G abuild
+        adduser -D build -G abuild
         cat>>/etc/doas.d/doas.conf<<EOF
         permit :abuild
         permit persist :abuild
