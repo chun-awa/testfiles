@@ -15,11 +15,10 @@ jobs:
     - name: Install dependencies
       run: |
         apk update
-        apk add --no-cache alpine-sdk alpine-conf syslinux xorriso squashfs-tools grub grub-efi doas mtools dosfstools
+        apk add --no-cache alpine-sdk alpine-conf syslinux xorriso squashfs-tools grub grub-efi doas mtools dosfstools coreutils
 
     - name: Prepare build environment
       run: |
-        export PATH=$PATH:/sbin:/usr/sbin
         useradd -m build
         usermod -aG abuild build
         cat>>/etc/doas.d/doas.conf<<EOF
