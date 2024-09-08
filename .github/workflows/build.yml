@@ -1,0 +1,36 @@
+name: Build Alpine ISO
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    container: docker.io/library/alpine:latest
+
+    steps:
+    - name: Install dependencies
+      run: |
+        apk add --no-cache alpine-sdk alpine-conf syslinux xorriso squashfs-tools grub grub-efi doas
+
+    - name: Clone aports repository
+      run: |
+        git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
+
+    - name: Build ISO
+      run: |
+        sh aports/scripts/mkimage.sh --tag edge \
+                                      --outdir ./iso \
+                                      --arch x86_64 \
+                                      --repository https://dl-cdn.alpinelinux.org/alpine/edge/main \
+                                      --profile standard
+
+    - name: Upload ISO
+      uses: actions/upload-artifact@v4
+      with:
+        name: iso
+        compression-level: 0
+        path: iso/*.iso
