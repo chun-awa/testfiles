@@ -23,7 +23,7 @@ jobs:
 
     - name: Build ISO
       run: |
-        mkdir iso
+        abuild-keygen --help
         sh aports/scripts/mkimage.sh --tag edge \
                                       --outdir ./iso \
                                       --arch x86_64 \
