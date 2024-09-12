@@ -21,7 +21,7 @@ prompt(){
 	printf "@"
 	printf $(hostname)
 	printf " "
-    printf $YELLOW
+        printf $YELLOW
 	printf $(pwd)
 	printf $RESET
 	printf " > "	
