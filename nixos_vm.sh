@@ -2,7 +2,7 @@
 [ -f VARS.fd ] || cp /usr/share/ovmf/x64/OVMF_VARS.fd VARS.fd
 qemu-system-x86_64 \
     -name "NixOS" \
-    -machine q35 \
+    -machine type=q35,usb=on \
     -enable-kvm \
     -cpu host \
     -smp 8 \
