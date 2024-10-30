@@ -9,7 +9,7 @@ qemu-system-x86_64 \
     -m 4096 \
     -cdrom latest-nixos-gnome-x86_64-linux.iso \
     -drive file=disk.qcow2,if=none,id=nvme0,cache=none,format=qcow2 \
-    -device nvme,drive=nvme0 \
+    -device nvme,drive=nvme0,serial=1234 \
     -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.fd \
     -drive if=pflash,format=raw,file=VARS.fd \
     -netdev user,id=net0,hostfwd=tcp::2222-:22 \
