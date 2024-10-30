@@ -6,7 +6,7 @@ qemu-system-x86_64 \
     -enable-kvm \
     -cpu host \
     -smp 8 \
-    -m 4096 \
+    -m 8192 \
     -cdrom latest-nixos-gnome-x86_64-linux.iso \
     -drive file=disk.qcow2,if=none,id=nvme0,cache=none,format=qcow2 \
     -device nvme,drive=nvme0,serial=1234 \
