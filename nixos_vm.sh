@@ -16,7 +16,7 @@ qemu-system-x86_64 \
     -device e1000,netdev=net0 \
     -display none \
     -vnc :0 \
-    -vga vmware \
+    -vga virtio \
     -serial stdio \
     -monitor telnet:127.0.0.1:5555,server,nowait \
     -audiodev pa,id=snd0 \
