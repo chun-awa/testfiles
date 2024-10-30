@@ -15,7 +15,7 @@ qemu-system-x86_64 \
     -netdev user,id=net0,hostfwd=tcp::2222-:22 \
     -device e1000,netdev=net0 \
     -display none \
-    -vnc :1 \
+    -vnc :0 \
     -vga vmware \
     -serial stdio \
     -monitor telnet:127.0.0.1:5555,server,nowait \
