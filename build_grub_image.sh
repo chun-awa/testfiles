@@ -22,7 +22,8 @@ mkfs.fat -C -n EFIBOOT efiboot.img 8192
 mmd -i efiboot.img ::/EFI ::/EFI/BOOT
 mcopy -vi efiboot.img \
         "iso/EFI/BOOT/BOOTIA32.EFI" \
-        "iso/EFI/BOOT/BOOTx64.EFI" \                                                                             ::/EFI/BOOT/
+        "iso/EFI/BOOT/BOOTx64.EFI" \
+        ::/EFI/BOOT/
 
 xorriso \
     -as mkisofs \
