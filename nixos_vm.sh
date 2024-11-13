@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -f VARS.fd ] || cp /usr/share/ovmf/x64/OVMF_VARS.fd VARS.fd
+[ -f VARS.fd ] || cp /usr/share/ovmf/x64/OVMF_VARS.4m.fd VARS.fd
 qemu-system-x86_64 \
     -name "NixOS" \
     -machine type=q35,usb=on \
@@ -10,7 +10,7 @@ qemu-system-x86_64 \
     -cdrom latest-nixos-gnome-x86_64-linux.iso \
     -drive file=disk.qcow2,if=none,id=nvme0,cache=none,format=qcow2 \
     -device nvme,drive=nvme0,serial=1234 \
-    -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF.fd \
+    -drive if=pflash,format=raw,readonly=on,file=/usr/share/ovmf/x64/OVMF_CODE.4m.fd \
     -drive if=pflash,format=raw,file=VARS.fd \
     -netdev user,id=net0,hostfwd=tcp::2222-:22 \
     -device e1000,netdev=net0 \
