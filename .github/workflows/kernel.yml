@@ -15,7 +15,7 @@ jobs:
     - name: Compile Kernel
       run: |
         KERNEL_VERSION=6.6.69
-        curl https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%.*}.x/linux-${KERNEL_VERSION}.tar.xz | tar -Jxf -
+        curl https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%.*}.x/linux-${KERNEL_VERSION}.tar.xz | tar -Jx
         pushd linux-${KERNEL_VERSION}
         make LLVM=1 defconfig  
         sed -i "s|.*\\(CONFIG_KERNEL_.*\\)=y|\\#\\ \\1 is not set|" .config
@@ -25,6 +25,7 @@ jobs:
         sed -i "s|^CONFIG_DEBUG_KERNEL.*|# CONFIG_DEBUG_KERNEL is not set|" .config
         sed -i "s|.*CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y.*|# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set|" .config
         sed -i "s|.*# CONFIG_CC_OPTIMIZE_FOR_SIZE is not set.*|CONFIG_CC_OPTIMIZE_FOR_SIZE=y|" .config
+        sed -i "s|.*CONFIG_AUDIT=y.*|# CONFIG_AUDIT is not set|" .config
         sed -i "s|.*CONFIG_FB_VESA.*|CONFIG_FB_VESA=y|" .config
         make LLVM=1 -j$(nproc)
         cp arch/x86/boot/bzImage ../vmlinuz
