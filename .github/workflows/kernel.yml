@@ -11,20 +11,20 @@ jobs:
     - name: Set up dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev
+        sudo apt-get install -y build-essential clang libncurses-dev bison flex libssl-dev libelf-dev
     - name: Compile Kernel
       run: |
         KERNEL_VERSION=6.6.69
         curl https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%.*}.x/linux-${KERNEL_VERSION}.tar.xz | tar -Jxvf -
         pushd linux-${KERNEL_VERSION}
-        make defconfig  
+        make LLVM=1 defconfig  
         sed -i "s|.*\\(CONFIG_KERNEL_.*\\)=y|\\#\\ \\1 is not set|" .config
         sed -i "s|.*# CONFIG_KERNEL_XZ is not set.*|CONFIG_KERNEL_XZ=y|" .config
         sed -i "s|^CONFIG_DEBUG_KERNEL.*|# CONFIG_DEBUG_KERNEL is not set|" .config
         sed -i "s|.*CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y.*|# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set|" .config
         sed -i "s|.*# CONFIG_CC_OPTIMIZE_FOR_SIZE is not set.*|CONFIG_CC_OPTIMIZE_FOR_SIZE=y|" .config
         sed -i "s|.*CONFIG_FB_VESA.*|CONFIG_FB_VESA=y|" .config
-        make -j$(nproc)
+        make LLVM=1 -j$(nproc)
         cp arch/x86/boot/bzImage ../vmlinuz
         popd
     - name: Upload artifact
