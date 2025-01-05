@@ -11,7 +11,7 @@ jobs:
     - name: Set up dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y musl-dev llvm lld clang clang-tools
+        sudo apt-get install -y musl-dev llvm lld clang clang-tools libelf-dev
     - name: Compile Busybox
       run: |
         BUSYBOX_VERSION=1.36.1
