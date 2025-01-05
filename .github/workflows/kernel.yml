@@ -18,7 +18,7 @@ jobs:
         curl https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 | tar -jx
         pushd busybox-${BUSYBOX_VERSION}
         make defconfig -j$(nproc)
-        LDFLAGS="--static" KCONFIG_NOTIMESTAMP=1 make CC=musl-gcc -j$(nproc)
+        LDFLAGS="--static" KCONFIG_NOTIMESTAMP=1 make CC=musl-gcc CFLAGS="-I/usr/include/linux" -j$(nproc)
         du -h busybox
         file busybox
         cp busybox ..
