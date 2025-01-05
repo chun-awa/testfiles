@@ -18,7 +18,7 @@ jobs:
         curl https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 | tar -jx
         pushd busybox-${BUSYBOX_VERSION}
         make defconfig
-        LDFLAGS="--static" CC=x86_64-linux-musl-gcc make -j$(nproc)
+        LDFLAGS="--static" make CC=musl-gcc -j$(nproc)
         du -h busybox
         file busybox
         cp busybox ..
