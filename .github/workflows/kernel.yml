@@ -11,7 +11,7 @@ jobs:
     - name: Set up dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential musl-dev llvm lld clang clang-tools libncurses-dev bison flex libssl-dev libelf-dev
+        sudo apt-get install -y musl-dev llvm lld clang clang-tools
     - name: Compile Busybox
       run: |
         BUSYBOX_VERSION=1.36.1
@@ -19,22 +19,47 @@ jobs:
         pushd busybox-${BUSYBOX_VERSION}
         make defconfig
         LDFLAGS="--static" CC=x86_64-linux-musl-gcc make -j$(nproc)
-        du -k busybox
+        du -h busybox
+        file busybox
+        cp busybox ..
+        popd
+    - name: Generate initramfs
+      run: |
+        mkdir rootfs
+        pushd rootfs
+        mkdir -p bin dev/{pts,shm} proc sys tmp
+        cp ../busybox bin
+        for i in $(../busybox --list);do
+          ln -sf busybox bin/$i
+        done
+        cat > init << EOF
+        #!/bin/sh
+        mount -t devtmpfs dev /dev
+        mount -t proc proc /proc
+        mount -t sysfs sys /sys
+        mount -t tmpfs tmpfs /tmp
+        mount -t devpts devpts /dev/pts
+        mount -t tmpfs tmpfs /dev/shm
+        setsid cttyhack /bin/sh
+        EOF
+        chmod +x init
+        find . -print0 | cpio -o --format=newc -0 -R 0:0 > ../rootfs.cpio
         popd
     - name: Compile Kernel
       run: |
         KERNEL_VERSION=6.6.69
         curl https://cdn.kernel.org/pub/linux/kernel/v${KERNEL_VERSION%%.*}.x/linux-${KERNEL_VERSION}.tar.xz | tar -Jx
         pushd linux-${KERNEL_VERSION}
-        make LLVM=1 defconfig  
+        make LLVM=1 defconfig
+        sed -i 's|.*CONFIG_INITRAMFS_SOURCE="".*|CONFIG_INITRAMFS_SOURCE="rootfs.cpio"|' .config
         sed -i "s|.*\\(CONFIG_KERNEL_.*\\)=y|\\#\\ \\1 is not set|" .config
         sed -i "s|.*# CONFIG_KERNEL_XZ is not set.*|CONFIG_KERNEL_XZ=y|" .config
         sed -i "s|^CONFIG_DEBUG_KERNEL.*|# CONFIG_DEBUG_KERNEL is not set|" .config
         sed -i "s|.*CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y.*|# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set|" .config
         sed -i "s|.*# CONFIG_CC_OPTIMIZE_FOR_SIZE is not set.*|CONFIG_CC_OPTIMIZE_FOR_SIZE=y|" .config
         sed -i "s|.*CONFIG_AUDIT=y.*|# CONFIG_AUDIT is not set|" .config
-        sed -i "s|.*CONFIG_PROFILING=y.*|# CONFIG_PROFILING is not set|" .config
         sed -i "s|.*CONFIG_FB_VESA.*|CONFIG_FB_VESA=y|" .config
+        cp ../rootfs.cpio .
         make LLVM=1 -j$(nproc)
         cp arch/x86/boot/bzImage ../vmlinuz
         popd
