@@ -60,6 +60,7 @@ jobs:
         sed -i "s|.*CONFIG_AUDIT=y.*|# CONFIG_AUDIT is not set|" .config
         sed -i "s|.*CONFIG_FTRACE=y.*|# CONFIG_FTRACE is not set|" .config
         sed -i "s|.*CONFIG_SOUND=y.*|# CONFIG_SOUND is not set|" .config
+        sed -i "s|.*CONFIG_CFG80211=y.*|# CONFIG_CFG80211 is not set|" .config
         sed -i "s|.*CONFIG_FB_VESA.*|CONFIG_FB_VESA=y|" .config
         cp ../rootfs.cpio .
         make LLVM=1 -j$(nproc)
