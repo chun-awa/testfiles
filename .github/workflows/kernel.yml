@@ -17,7 +17,7 @@ jobs:
         BUSYBOX_VERSION=1.36.1
         docker run --rm -v $PWD/busybox:/busybox-${BUSYBOX_VERSION} archlinux env BUSYBOX_VERSION=${BUSYBOX_VERSION} sh -c "
           pacman-key --init
-          pacman -Syu --noconfirm base-devel musl linux-headers
+          pacman -Syu --noconfirm base-devel musl kernel-headers-musl
           curl https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 | tar -jx
           cd busybox-${BUSYBOX_VERSION}
           make defconfig -j$(nproc)
