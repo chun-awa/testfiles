@@ -11,25 +11,25 @@ jobs:
     - name: Set up dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y musl-tools llvm lld clang clang-tools libelf-dev linux-libc-dev linux-headers-generic
+        sudo apt-get install -y llvm lld clang clang-tools libelf-dev
     - name: Compile Busybox
       run: |
         BUSYBOX_VERSION=1.36.1
-        curl https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 | tar -jx
-        pushd busybox-${BUSYBOX_VERSION}
-        make defconfig -j$(nproc)
-        LDFLAGS="--static" KCONFIG_NOTIMESTAMP=1 make -j$(nproc)
-        du -h busybox
-        file busybox
-        cp busybox ..
-        popd
+        docker run --rm -v $PWD/busybox:/busybox-${BUSYBOX_VERSION} archlinux BUSYBOX_VERSION=${BUSYBOX_VERSION} sh -c "
+          pacman-key --init
+          pacman -Syu --noconfirm base-devel musl
+          curl https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 | tar -jx
+          cd busybox-${BUSYBOX_VERSION}
+          make defconfig -j$(nproc)
+          LDFLAGS="--static" KCONFIG_NOTIMESTAMP=1 make CC=musl-gcc -j$(nproc)
+        "
     - name: Generate initramfs
       run: |
         mkdir rootfs
         pushd rootfs
         mkdir -p bin dev/{pts,shm} proc sys tmp
-        cp ../busybox bin
-        for i in $(../busybox --list);do
+        cp ../busybox/busybox bin
+        for i in $(./bin/busybox --list);do
           ln -sf busybox bin/$i
         done
         cat > init << EOF
