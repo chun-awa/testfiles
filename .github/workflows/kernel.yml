@@ -15,7 +15,7 @@ jobs:
     - name: Compile Busybox
       run: |
         BUSYBOX_VERSION=1.36.1
-        docker run --rm -v $PWD/busybox:/busybox-${BUSYBOX_VERSION} archlinux BUSYBOX_VERSION=${BUSYBOX_VERSION} sh -c "
+        docker run --rm -v $PWD/busybox:/busybox-${BUSYBOX_VERSION} archlinux env BUSYBOX_VERSION=${BUSYBOX_VERSION} sh -c "
           pacman-key --init
           pacman -Syu --noconfirm base-devel musl
           curl https://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 | tar -jx
