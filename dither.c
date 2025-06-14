@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
+#include <stdarg.h>
 
 #pragma pack(push, 1)
 typedef struct {
@@ -38,7 +40,26 @@ typedef struct {
 RGBQUAD palette[256];
 unsigned char* color_lut = NULL;
 
+void log_message(const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+}
+
+void update_progress(int current, int total) {
+    static int last_percent = -1;
+    int percent = (current * 100) / total;
+    
+    if (percent != last_percent) {
+        last_percent = percent;
+        fprintf(stderr, "\rProcessing: %3d%% complete", percent);
+        fflush(stderr);
+    }
+}
+
 void generate_palette() {
+    log_message("Generating 256-color palette...\n");
     for (int i = 0; i < 216; i++) {
         palette[i].r = (i / 36) * 51;
         palette[i].g = ((i % 36) / 6) * 51;
@@ -67,20 +88,38 @@ int find_nearest_color(unsigned char r, unsigned char g, unsigned char b) {
 }
 
 void build_color_lut() {
+    log_message("Building color lookup table...\n");
+    clock_t start = clock();
+    
     color_lut = malloc(1 << 24);  // 16MB for 24-bit RGB
-    if (!color_lut) return;
+    if (!color_lut) {
+        log_message("Warning: Could not allocate 16MB for color LUT, falling back to slower search\n");
+        return;
+    }
 
+    int total = 256 * 256 * 256;
+    int count = 0;
+    
     for (int r = 0; r < 256; r++) {
         for (int g = 0; g < 256; g++) {
             for (int b = 0; b < 256; b++) {
                 int idx = (r << 16) | (g << 8) | b;
                 color_lut[idx] = find_nearest_color(r, g, b);
+                count++;
             }
         }
+        update_progress(r * 256 * 256, total);
     }
+    
+    double elapsed = (double)(clock() - start) / CLOCKS_PER_SEC;
+    log_message("\nColor LUT built in %.2f seconds\n", elapsed);
+    fprintf(stderr, "\n");  // New line after progress
 }
 
 int main(int argc, char *argv[]) {
+    clock_t total_start = clock();
+    log_message("Starting BMP conversion\n");
+    
     if (argc != 3) {
         fprintf(stderr, "Usage: %s <input.bmp> <output.bmp>\n", argv[0]);
         return 1;
@@ -91,6 +130,7 @@ int main(int argc, char *argv[]) {
         perror("Error opening input file");
         return 1;
     }
+    log_message("Opened input file: %s\n", argv[1]);
 
     BITMAPFILEHEADER bfh;
     BITMAPINFOHEADER bih;
@@ -116,6 +156,9 @@ int main(int argc, char *argv[]) {
     int height = abs(bih.height);
     int is_top_down = bih.height < 0;
     bih.height = height;
+    
+    log_message("Image dimensions: %d x %d pixels\n", width, height);
+    log_message("Pixel format: 24-bit RGB\n");
 
     int in_row_size = (width * 3 + 3) & ~3;
     unsigned char* in_pixels = malloc(in_row_size * height);
@@ -126,6 +169,7 @@ int main(int argc, char *argv[]) {
     }
 
     fseek(in, bfh.offset, SEEK_SET);
+    log_message("Reading pixel data...\n");
     if (fread(in_pixels, in_row_size, height, in) != height) {
         perror("Error reading pixel data");
         free(in_pixels);
@@ -133,6 +177,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     fclose(in);
+    log_message("Read %d KB of pixel data\n", (in_row_size * height + 1023) / 1024);
 
     generate_palette();
     build_color_lut();
@@ -158,10 +203,14 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    log_message("Allocated error buffers\n");
 
     int cur_error_idx = 0;
     int next_error_idx = 1;
 
+    log_message("Starting dithering process...\n");
+    clock_t dither_start = clock();
+    
     for (int y = 0; y < height; y++) {
         int src_y = is_top_down ? y : height - 1 - y;
         unsigned char* row = in_pixels + src_y * in_row_size;
@@ -229,7 +278,19 @@ int main(int argc, char *argv[]) {
         int temp = cur_error_idx;
         cur_error_idx = next_error_idx;
         next_error_idx = temp;
+        
+        // Update progress every 1% or every row for small images
+        if (height > 100) {
+            if (y % (height / 100) == 0 || y == height - 1) {
+                update_progress(y, height - 1);
+            }
+        } else {
+            update_progress(y, height - 1);
+        }
     }
+    
+    double dither_time = (double)(clock() - dither_start) / CLOCKS_PER_SEC;
+    log_message("\nDithering completed in %.2f seconds\n", dither_time);
     
     // Free input and error buffers
     free(in_pixels);
@@ -247,6 +308,7 @@ int main(int argc, char *argv[]) {
         if (color_lut) free(color_lut);
         return 1;
     }
+    log_message("Writing output to: %s\n", argv[2]);
 
     bfh.offset = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + sizeof(palette);
     bfh.size = bfh.offset + ((width + 3) & ~3) * height;
@@ -259,6 +321,7 @@ int main(int argc, char *argv[]) {
     fwrite(palette, sizeof(palette), 1, out);
 
     int out_row_size = (width + 3) & ~3;
+    log_message("Writing pixel data...\n");
     for (int y = height - 1; y >= 0; y--) {
         fwrite(out_pixels + y * width, 1, width, out);
         for (int p = width; p < out_row_size; p++) {
@@ -269,5 +332,10 @@ int main(int argc, char *argv[]) {
     free(out_pixels);
     if (color_lut) free(color_lut);
     fclose(out);
+    
+    double total_time = (double)(clock() - total_start) / CLOCKS_PER_SEC;
+    log_message("Conversion completed in %.2f seconds\n", total_time);
+    log_message("Output file created successfully\n");
+    
     return 0;
 }
